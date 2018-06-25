@@ -1,25 +1,25 @@
 package it.devday.sparkplayground
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
-/***
-  * https://www.kaggle.com/levaniz/machine-learning-analysis-of-flights-data/data
-  */
+
 class FlightsService {
 
-  def extract(filename:String, spark: SparkSession):DataFrame = {
-    val flightsCsv = getClass.getResource(s"/$filename") // Should be some file on your system
+  val base_dir = "/Users/rosario/other_project/spark-playground/flight_csv"
+
+  def load(filename:String, spark: SparkSession):DataFrame = {
+    val flightsCsv = s"/Users/rosario/other_project/spark-playground/flight_csv/$filename" // Should be some file on your system
     val flightDS = spark
       .read
       .format("csv")
       .option("header", "true")
       .option("inferSchema", "true")
-      .load(flightsCsv.getPath) //.cache()
+      .load(flightsCsv) //.cache()
     flightDS
   }
 
-  def load(flightDS: DataFrame, partitions:Int = 3): Unit = {
-    val destPath = "D:\\Projects\\spark-playground\\flight_csv"
+  def save(flightDS: DataFrame, partitions:Int = 3): Unit = {
+    val destPath = "/Users/rosario/other_project/spark-playground/flight_csv_generated"
     flightDS
       .repartition(partitions)
       .write
@@ -27,7 +27,4 @@ class FlightsService {
       .option("header", "true")
       .save(destPath)
   }
-
-
-
 }
